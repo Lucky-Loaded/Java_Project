@@ -6,6 +6,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.swing.JButton;
@@ -23,7 +24,9 @@ public class Workers extends JFrame  {
 	PreparedStatement state=null;
 	Connection conn=null;
     JTabbedPane tab=new JTabbedPane();
+    private ResultSet result = null;
     int id = -1;
+    
     
     JTable tableW = new JTable();
     JScrollPane scrollerW = new JScrollPane(tableW);
@@ -53,17 +56,18 @@ public class Workers extends JFrame  {
     
     JLabel name = new JLabel("Name: ");
     JLabel pos_name = new JLabel("Position name: ");
-	JLabel date = new JLabel("Date: ");
+	JLabel date = new JLabel("Date(yyyy-mm-dd) :  ");
 	JLabel type = new JLabel("Type: ");
-	JLabel date_time = new JLabel("Date: ");
+	//JLabel date_time = new JLabel("Date: ");
 	JLabel email = new JLabel("Email: ");
 	JLabel city = new JLabel("City: ");
 	
     JTextField nameTF = new JTextField();
     JTextField pos_nameTF = new JTextField();
     JTextField dateTF = new JTextField();
-    JTextField typeTF = new JTextField();
-    JTextField date_timeTF = new JTextField();
+    String[] item = {"Full-time", "Temporary"};
+    JComboBox<String> typeCombo = new JComboBox<String>(item);
+    //JTextField date_timeTF = new JTextField();
     JTextField emailTF = new JTextField();
     JTextField cityTF = new JTextField();
     //1
@@ -71,6 +75,7 @@ public class Workers extends JFrame  {
 	JButton deleteBtnW = new JButton("Delete");
 	JButton editBtnW = new JButton("Edit");
 	JButton searchBtnW = new JButton("Search");
+	JButton allBtnW = new JButton("All");
 	JComboBox<String> searchComboW = new JComboBox<String>();
 	//2
 	JButton addBtnC = new JButton("Add");
@@ -94,7 +99,6 @@ public class Workers extends JFrame  {
     	tab.add(contractPanel,"Contracts");
     	tab.add(positionPanel,"Positions");
     	tab.add(searchPanel,"Info");
-    workerPanel.add(upPanelW);
     	this.add(tab);
     	
     	//1
@@ -119,15 +123,17 @@ public class Workers extends JFrame  {
    	//
   	 upPanelC.setLayout(new GridLayout(4,2));
   	 upPanelC.add(type);
-  	 upPanelC.add(typeTF);
-  	 upPanelC.add(date_time);
-  	 upPanelC.add(date_timeTF);
+  	 upPanelC.add(typeCombo);
+  	 //upPanelC.add(date_time);
+  	 //upPanelC.add(date_timeTF);
 
    	 //1
    	 midPanelW.add(addBtnW);
 	 midPanelW.add(deleteBtnW);
 	 midPanelW.add(editBtnW);
-	// midPanelW.add(searchBtnW);
+	 midPanelW.add(searchBtnW);	
+	 midPanelW.add(searchComboW);
+	 midPanelW.add(allBtnW);
 	 
    	 ///
 	 //2
@@ -147,6 +153,9 @@ public class Workers extends JFrame  {
 	 //1
 	 addBtnP.addActionListener(new AddPosition());
 	 deleteBtnP.addActionListener(new DeletePosition());
+	 DBHelper.fillCombo(searchComboW, "name" ,"worker");
+	 searchBtnW.addActionListener(new SearchAction());
+	 allBtnW.addActionListener(new SearchResetAction());
 	 //2
 	 
 	 deleteBtnC.addActionListener(new DeleteContract());
@@ -205,11 +214,11 @@ public class Workers extends JFrame  {
 		 pos_nameTF.setText("");
 		 
 	 }
-    public void clearFormC() {
-		 typeTF.setText("");
-		 date_timeTF.setText("");
+   // public void clearFormC() {
+	//	 typeTF.setText("");
+	//	 date_timeTF.setText("");
 
-	 }
+	// }
     ///
     //1
     ///
@@ -225,6 +234,8 @@ public class Workers extends JFrame  {
 				state=conn.prepareStatement(sql);
 				state.setString(1, pos_name);
 				state.execute();
+				tableP.setModel(DBHelper.getAllData("position"));
+				DBHelper.fillCombo(searchComboW, "name" ,"worker");
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -285,6 +296,25 @@ public class Workers extends JFrame  {
    	 }
    	 
     }
+     class DeleteAction implements ActionListener{
+      	 @Override
+      	 public void actionPerformed(ActionEvent e) {
+      		 conn = DBHelper.getConnection();
+      		 String sql = "delete from position where id=?";
+      		 try {
+      			state = conn.prepareStatement(sql);
+      			state.setInt(1, id);
+      			state.execute();
+      			id = -1;
+      			tableP.setModel(DBHelper.getAllData("position"));
+      		} catch (SQLException e1) {
+      			// TODO Auto-generated catch block
+      			e1.printStackTrace();
+      		}
+      		 
+      	 }
+      	 
+       }
     //
     //2
     //
@@ -329,7 +359,54 @@ public class Workers extends JFrame  {
    	 }
    	 
     }
+    class SearchAction implements ActionListener{
+		 @Override
+		 public void actionPerformed(ActionEvent e) {
+			String selectedItem = searchComboW.getSelectedItem().toString();
+			String[] items = selectedItem.split(" ");
+			int itemID = Integer.parseInt(items[0]);
+			 
+			 conn = DBHelper.getConnection();
+			 
+			 String sql = "select * from worker where id=? ";
+			try { 
+			
+				state = conn.prepareStatement(sql);
+				state.setInt(1, itemID);
+				result = state.executeQuery();
+				tableW.setModel(new MyModel(result));
+				DBHelper.fillCombo(searchComboW, "name" ,"worker");
+			} catch(SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				
+			} catch(Exception e1) {
+				//TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		 
+			
+		 }
+		 
+	 }
+    class SearchResetAction implements ActionListener{
+        public void actionPerformed(ActionEvent e) {
+            // TODO Auto-generated method stub
+                conn = DBHelper.getConnection();
 
+                String sql = "select * from worker";
+
+                try {
+                    state = conn.prepareStatement(sql);
+                    state.execute();
+                    tableW.setModel(DBHelper.getAllData("worker"));
+
+                } catch (SQLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+                }
+    }
     class TableListenerW implements MouseListener{
 
     	@Override
@@ -435,5 +512,5 @@ public class Workers extends JFrame  {
     	 
      
      }
-    } 
+    }
 

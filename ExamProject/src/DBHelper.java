@@ -4,6 +4,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.swing.JComboBox;
+
 //import javax.swing.JComboBox;
 
 public class DBHelper {
@@ -13,11 +15,12 @@ public class DBHelper {
 	static MyModel model = null;
 	
 	
-	/*static void fillCombo(JComboBox<String> combo) {
+	static void fillCombo(JComboBox<String> combo,String variable,String tableName) {
 		conn = getConnection();
-		String sql = "select id,name from worker";
+		String sql = "select id, "+ variable+" from " + tableName;
 		try {
 			state = conn.prepareStatement(sql);
+			
 			result = state.executeQuery(); //combo.setModel(aModel);
 			combo.removeAllItems();
 			while(result.next()) {
@@ -30,7 +33,7 @@ public class DBHelper {
 			e.printStackTrace();
 		}
 		
-	}*/
+	}
 static MyModel getAllData(String tableName) {
 		
 		conn = getConnection();
@@ -62,4 +65,5 @@ public static Connection getConnection() {
 		}
 		return conn;
 	}
+
 }
