@@ -16,6 +16,7 @@ public class MyModel extends AbstractTableModel {
 	private int rowCount;	
 	private int columnCount;
 	private ArrayList<Object> data=new ArrayList<Object>();
+	private ArrayList<String> position =new ArrayList<String>();
 	 
 	 public MyModel(ResultSet rs) throws Exception
 	 {
@@ -62,4 +63,9 @@ public class MyModel extends AbstractTableModel {
 			 return null;
 		 }
 	 }// end getColumnName
+
+	public ArrayList<String> getPosition() {
+		// TODO Auto-generated method stub
+		return position;
+	}
 } // end class MyModel 
