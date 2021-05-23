@@ -624,7 +624,6 @@ public class Workers extends JFrame  {
 					+ "and P.ID=? AND W.CITY =?"
 					+ "GROUP BY C.ID;";
 			try { 
-			
 				state = conn.prepareStatement(sql);
 				state.setInt(1, itemID);
 				state.setString(2, selectedCity);
