@@ -37,20 +37,19 @@ public class DBHelper {
 		}
 		
 	}
-	
-	static void fillComboContract(JComboBox<String> combo) {
+	static void fillComboCity(JComboBox<String> combo,String variable,String tableName) {
 		conn = getConnection();
-		String sql = "SELECT CONTRACT.ID, WORKER.NAME FROM CONTRACT, WORKER\r\n"
-				+ "WHERE CONTRACT.ID_WORKER = WORKER.ID";
+		String sql = "select "+ variable+" from " + tableName;
 		try {
 			state = conn.prepareStatement(sql);
 			
 			result = state.executeQuery(); //combo.setModel(aModel);
 			combo.removeAllItems();
 			while(result.next()) {
-				String item = result.getObject(1).toString();
-				String itemName = result.getObject(2).toString();
-				combo.addItem(item + " " + itemName);
+				
+				String item = result.getObject(1).toString() ;
+				combo.addItem(item);
+				
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -58,6 +57,8 @@ public class DBHelper {
 		}
 		
 	}
+	
+
 static MyModel getAllData(String tableName) {
 		
 		conn = getConnection();
@@ -94,10 +95,30 @@ static MyModel getAllDataTable() {
 	}
 	return model;
 }
+static MyModel getAllDataTableContract() {
+	conn = getConnection();
+	String sql = "SELECT C.id,  C.type, C.date_time,W.name AS Worker_Name "
+			+ "FROM contract C join worker W "
+			+ "on C.id_worker = w.ID";
+	try {
+		state = conn.prepareStatement(sql);
+		result = state.executeQuery();
+		model = new MyModel(result);
+		
+		
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	return model;
+}
 static MyModel getAllDataTableInfo() {
 	conn = getConnection();
-	String sql = "SELECT C.ID ,C.TYPE, C.DATE_TIME, W.NAME, P.NAME FROM CONTRACT C, WORKER W, POSITION P "
-			+ "WHERE C.ID_WORKER = W.ID AND W.ID_POSITION = P.ID ;";
+	String sql ="SELECT C.ID ,C.TYPE, C.DATE_TIME, W.NAME, W.CITY, P.NAME FROM CONTRACT C, WORKER W, POSITION P \r\n"
+				+"WHERE C.ID_WORKER = W.ID AND W.ID_POSITION = P.ID ";
 	try {
 		state = conn.prepareStatement(sql);
 		result = state.executeQuery();
