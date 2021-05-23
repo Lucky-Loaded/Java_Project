@@ -26,6 +26,7 @@ public class DBHelper {
 			result = state.executeQuery(); //combo.setModel(aModel);
 			combo.removeAllItems();
 			while(result.next()) {
+				
 				String item = result.getObject(1).toString() + " " + result.getObject(2);
 				combo.addItem(item);
 				
@@ -36,6 +37,7 @@ public class DBHelper {
 		}
 		
 	}
+	
 	static void fillComboContract(JComboBox<String> combo) {
 		conn = getConnection();
 		String sql = "SELECT CONTRACT.ID, WORKER.NAME FROM CONTRACT, WORKER\r\n"
@@ -72,7 +74,7 @@ static MyModel getAllData(String tableName) {
 		}
 		return model;
 	}
-static MyModel getAllDataTable(/*String table1, String table2,*/ ) {
+static MyModel getAllDataTable() {
 	conn = getConnection();
 	String sql = "SELECT w.id,  w.name, w.birthday,w.email,w.city,p.name AS POSITION "
 			+ "FROM worker w join position P "
@@ -92,8 +94,25 @@ static MyModel getAllDataTable(/*String table1, String table2,*/ ) {
 	}
 	return model;
 }
-
-
+static MyModel getAllDataTableInfo() {
+	conn = getConnection();
+	String sql = "SELECT C.ID ,C.TYPE, C.DATE_TIME, W.NAME, P.NAME FROM CONTRACT C, WORKER W, POSITION P "
+			+ "WHERE C.ID_WORKER = W.ID AND W.ID_POSITION = P.ID ;";
+	try {
+		state = conn.prepareStatement(sql);
+		result = state.executeQuery();
+		model = new MyModel(result);
+		
+		
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	return model;
+}
 public static Connection getConnection() {
 		
 		try {

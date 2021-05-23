@@ -39,10 +39,15 @@ public class Workers extends JFrame  {
     JTable tableP = new JTable();
     JScrollPane scrollerP = new JScrollPane(tableP);
     
+    
+    JTable tableInfo = new JTable();
+    JScrollPane scrollerInfo = new JScrollPane();
+    
+    
 	JPanel workerPanel=new JPanel();
 	JPanel contractPanel=new JPanel();
 	JPanel positionPanel=new JPanel();
-	JPanel searchPanel = new JPanel();
+	JPanel infoPanel = new JPanel();
 	//1
     JPanel upPanelW = new JPanel();
     JPanel midPanelW  = new JPanel();
@@ -55,16 +60,25 @@ public class Workers extends JFrame  {
     JPanel upPanelP = new JPanel();
     JPanel midPanelP  = new JPanel();
     JPanel downPanelP = new JPanel();
+    //4
+    JPanel downPanelInfo = new JPanel();
+    
+    
+    ////////
+    
     
     JLabel name = new JLabel("Name: ");
     JLabel pos_name = new JLabel("Position name: ");
 	JLabel date = new JLabel("Date(yyyy-mm-dd) :  ");
 	JLabel type = new JLabel("Type: ");
-	//JLabel date_time = new JLabel("Date: ");
 	JLabel email = new JLabel("Email: ");
 	JLabel city = new JLabel("City: ");
 	JLabel addContractComboLabel = new JLabel("Select Worker: ");
 	JLabel addWorkerComboLabel = new JLabel("Select position: ");
+	
+	
+	///////
+	
 	
     JTextField nameTF = new JTextField();
     JTextField pos_nameTF = new JTextField();
@@ -81,7 +95,6 @@ public class Workers extends JFrame  {
 	JButton allBtnW = new JButton("Reset");
 	JComboBox<String> searchComboW = new JComboBox<String>();
 	JComboBox<String> addWorkerCombo = new JComboBox<String>();
-	
 	//2
 	JButton addBtnC = new JButton("Add");
 	JButton deleteBtnC = new JButton("Delete");
@@ -105,7 +118,7 @@ public class Workers extends JFrame  {
         tab.add(workerPanel,"Workers");
     	tab.add(contractPanel,"Contracts");
     	tab.add(positionPanel,"Positions");
-    	tab.add(searchPanel,"Info");
+    	tab.add(infoPanel,"Info");
     	this.add(tab);
     	
     	//1
@@ -120,19 +133,19 @@ public class Workers extends JFrame  {
    	 upPanelW.add(cityTF);
    	 upPanelW.add(addWorkerComboLabel);
    	 upPanelW.add(addWorkerCombo);
-   	DBHelper.fillCombo(addWorkerCombo, "name", "position");
+   	 DBHelper.fillCombo(addWorkerCombo, "name", "position");
    	 //upPanelW.add(positionCombo);
    	 ///
    	 //2
    	 ///
-   	upPanelP.setLayout(new GridLayout(2,1));
+   	 upPanelP.setLayout(new GridLayout(2,1));
   	 upPanelP.add(pos_name);
   	 upPanelP.add(pos_nameTF);
   	 
   	 
-   //	 
-//3
-   	//
+     //	 
+     //3
+   	 //
   	 upPanelC.setLayout(new GridLayout(4,2));
   	 upPanelC.add(type);
   	 upPanelC.add(typeCombo);
@@ -166,6 +179,8 @@ public class Workers extends JFrame  {
 	 midPanelC.add(editBtnC);
 	 midPanelC.add(searchBtnC);
 	 midPanelC.add(searchComboC);
+	 
+	 /////////ACTION BUTTONS
 	 //1
 	 addBtnP.addActionListener(new AddPosition());
 	 searchBtnP.addActionListener(new SearchActionP());
@@ -173,10 +188,14 @@ public class Workers extends JFrame  {
 	 DBHelper.fillCombo(searchComboP, "name", "position");
 	 editBtnP.addActionListener(new EditActionP());
 	
+	 
 	 //2
 	 addBtnC.addActionListener(new AddContract());
 	 deleteBtnC.addActionListener(new DeleteContract());
 	 DBHelper.fillComboContract(searchComboC);
+	 editBtnC.addActionListener(new EditActionC());
+	 
+	 
 	 //3
 	addBtnW.addActionListener(new AddWorker());
 	 deleteBtnW.addActionListener(new DeleteWorker());
@@ -184,6 +203,9 @@ public class Workers extends JFrame  {
 	 editBtnW.addActionListener(new EditActionW());
 	 allBtnW.addActionListener(new SearchResetActionW());
 	 DBHelper.fillCombo(searchComboW, "name" ,"worker");
+	 
+	 
+	 /////////ACTION BUTTONS
 	 
 	 
 	 //1 DOWNPANEL
@@ -202,6 +224,10 @@ public class Workers extends JFrame  {
 	 tableC.setModel(DBHelper.getAllData("contract"));
 	 tableC.addMouseListener(new TableListenerC());
 	 
+	 //4
+	 downPanelInfo.add(scrollerInfo);
+	 scrollerInfo.setPreferredSize(new Dimension(400, 400));
+	 tableInfo.setModel(DBHelper.getAllDataTableInfo());
 	 
 	 //1
 	workerPanel.setLayout(new GridLayout(3,1));
@@ -221,7 +247,10 @@ public class Workers extends JFrame  {
 	contractPanel.add(upPanelC);
 	contractPanel.add(midPanelC);
 	contractPanel.add(downPanelC);
-	
+	//4
+	infoPanel.setLayout(new GridLayout(3,1));
+	infoPanel.setSize(700,800);
+	infoPanel.add(downPanelInfo);
 	
 	 this.setVisible(true);
 	 /// END
@@ -308,10 +337,8 @@ public class Workers extends JFrame  {
      public class AddContract implements ActionListener{
       	 @Override
       	 public void actionPerformed(ActionEvent arg0) {
-      		 String selectedType = addContractCombo.getSelectedItem().toString();
-      		
-      		 //
-      		String selectedItem = addWorkerCombo.getSelectedItem().toString();
+      		 String selectedType = typeCombo.getSelectedItem().toString();
+       		String selectedItem = addContractCombo.getSelectedItem().toString();
     		String[] items = selectedItem.split(" ");
     		int itemID = Integer.parseInt(items[0]);
       		 conn=DBHelper.getConnection();
@@ -327,7 +354,7 @@ public class Workers extends JFrame  {
       			
       			
       			state.execute();
-      			tableW.setModel(DBHelper.getAllDataTable());
+      			tableC.setModel(DBHelper.getAllData("Contract"));
       			DBHelper.fillCombo(searchComboC, "name" ,"worker");
       		} catch (SQLException e) {
       			// TODO Auto-generated catch block
@@ -577,10 +604,12 @@ public class Workers extends JFrame  {
     ///
     class EditActionW implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
-			
+			String selectedItem = addWorkerCombo.getSelectedItem().toString();
+			String[] items = selectedItem.split(" ");
+			int itemID = Integer.parseInt(items[0]);
 				// TODO Auto-generated method stub
 				conn = DBHelper.getConnection();
-				String sql = "UPDATE worker SET name = \'" + nameTF.getText() + "\', Birthday = \'"  + dateTF.getText() + "\', email = \'"+ emailTF.getText() + "\', City = \'"+ cityTF.getText() + "\'  WHERE ID=?;";
+				String sql = "UPDATE worker SET name = \'" + nameTF.getText() + "\', Birthday = \'"  + dateTF.getText() + "\', email = \'"+ emailTF.getText() + "\', City = \'"+ cityTF.getText() + "\', id_position = "+ itemID+ "  WHERE ID=?;";
 				try {
 					state = conn.prepareStatement(sql);
 					state.setInt(1, id);
@@ -588,6 +617,7 @@ public class Workers extends JFrame  {
 					id = -1;
 					tableW.setModel(DBHelper.getAllDataTable());
 					DBHelper.fillCombo(searchComboW, "name", "worker");
+					
 					
 				} catch (SQLException e1) {
 					// TODO Auto-generated catch block
@@ -599,15 +629,19 @@ public class Workers extends JFrame  {
 		public void actionPerformed(ActionEvent e) {
 			
 				// TODO Auto-generated method stub
+			String selectedType = typeCombo.getSelectedItem().toString();
+       		String selectedItem = addContractCombo.getSelectedItem().toString();
+    		String[] items = selectedItem.split(" ");
+    		int itemID = Integer.parseInt(items[0]);
 				conn = DBHelper.getConnection();
-				String sql = "UPDATE worker SET name = \'" + nameTF.getText() + "\', Birthday = \'"  + dateTF.getText() + "\', email = \'"+ emailTF.getText() + "\', City = \'"+ cityTF.getText() + "\'  WHERE ID=?;";
+				String sql = "UPDATE contract SET type = \'" + selectedType + "\', id_worker = "  + itemID + "  WHERE ID=?;";
 				try {
 					state = conn.prepareStatement(sql);
 					state.setInt(1, id);
 					state.execute();
 					id = -1;
-					tableW.setModel(DBHelper.getAllDataTable());
-					DBHelper.fillCombo(searchComboW, "name", "worker");
+					tableW.setModel(DBHelper.getAllDataTableInfo());
+					DBHelper.fillComboContract(searchComboC);
 					
 				} catch (SQLException e1) {
 					// TODO Auto-generated catch block
