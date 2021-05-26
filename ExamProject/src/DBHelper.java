@@ -1,9 +1,12 @@
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import javax.swing.JComboBox;
 
@@ -39,7 +42,7 @@ public class DBHelper {
 	}
 	static void fillComboCity(JComboBox<String> combo,String variable,String tableName) {
 		conn = getConnection();
-		String sql = "select "+ variable+" from " + tableName;
+		String sql = "select distinct "+ variable+" from " + tableName;
 		try {
 			state = conn.prepareStatement(sql);
 			
@@ -135,18 +138,29 @@ static MyModel getAllDataTableInfo() {
 	return model;
 }
 public static Connection getConnection() {
-		
-		try {
-			Class.forName("org.h2.Driver");
-			conn=DriverManager.getConnection("jdbc:h2:tcp://localhost/C:\\Users\\bystr\\Desktop\\SIDB;AUTO_SERVER=TRUE","sa","sa");
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return conn;
-	}
 
+    try {
+        File file = new File("C:\\Users\\bystr\\git\\Java_Project\\ExamProject\\src\\config.txt");
+        Scanner sc = new Scanner(file);
+        String connString = "",username = "",password = "";
+        while(sc.hasNextLine()) {
+            connString = sc.nextLine().trim();
+            username = sc.nextLine().trim();
+            password = sc.nextLine().trim();
+        }
+
+        Class.forName("org.h2.Driver");
+        conn = DriverManager.getConnection(connString, username, password);
+    } catch (ClassNotFoundException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    } catch (SQLException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    } catch (FileNotFoundException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    }
+    return conn;
 }
+}//end method

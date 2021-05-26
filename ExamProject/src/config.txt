@@ -1,0 +1,3 @@
+jdbc:h2:tcp://localhost/C:\\Users\\bystr\\Desktop\\SIDB;AUTO_SERVER=TRUE
+sa
+sa
